@@ -20,14 +20,23 @@
   box-sizing: border-box;
 }
 
+html {
+  min-height: 100%;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
 body {
   margin: 0;
+  min-width: 320px;
   min-height: 100vh;
+  min-height: 100svh;
   background:
     radial-gradient(circle at 18% 12%, rgba(255, 195, 91, 0.32), transparent 28%),
     radial-gradient(circle at 85% 18%, rgba(255, 231, 179, 0.7), transparent 22%),
     linear-gradient(135deg, #fffdfa 0%, var(--bg) 52%, #ffe4b7 100%);
   color: var(--text);
+  overflow-x: hidden;
 }
 
 button,
@@ -669,6 +678,7 @@ textarea {
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.86);
   color: var(--text);
+  font-size: 16px;
   outline: none;
 }
 
@@ -1106,11 +1116,13 @@ textarea:focus {
 
 .collection-detail-panel {
   max-height: min(82vh, 620px);
+  max-height: min(82svh, 620px);
   overflow: auto;
 }
 
 .collection-items--modal {
   max-height: min(48vh, 360px);
+  max-height: min(48svh, 360px);
   overflow: auto;
   padding-right: 2px;
 }
@@ -1118,6 +1130,7 @@ textarea:focus {
 .restaurant-detail-items {
   display: flex;
   max-height: min(52vh, 390px);
+  max-height: min(52svh, 390px);
   flex-direction: column;
   gap: 10px;
   overflow: auto;
@@ -1176,6 +1189,7 @@ textarea:focus {
 
   .phone-shell {
     min-height: 100vh;
+    min-height: 100svh;
     border-radius: 0;
     padding: 12px;
   }
