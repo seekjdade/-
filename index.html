@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>今天吃点啥</title>
+  <link rel="stylesheet" href="style.css?v=20260625-1637" />
+</head>
+<body>
+  <main class="app">
+    <section class="phone-shell" aria-label="今天吃点啥小程序">
+      <header class="hero">
+        <div>
+          <h1>今天吃点啥？</h1>
+          <p class="design-credit">Designed by 豆瓣酱</p>
+        </div>
+        <div class="hero-badge" aria-hidden="true">🍱</div>
+      </header>
+
+      <section class="auth-card" id="authCard">
+        <p class="eyebrow">Account</p>
+        <h2>用户名登录</h2>
+        <p class="panel-desc">用户名全站唯一；如果注册时重复，系统会提醒你重新注册。</p>
+        <form class="auth-form" id="authForm">
+          <label>
+            用户名
+            <input id="usernameInput" type="text" maxlength="24" autocomplete="username" placeholder="2-24 位中文、字母、数字、_ 或 -" />
+          </label>
+          <div class="auth-actions">
+            <button class="primary-action" type="button" id="loginBtn">登录</button>
+            <button class="secondary-action" type="button" id="registerBtn">注册</button>
+          </div>
+        </form>
+        <p class="auth-message" id="authMessage" aria-live="polite"></p>
+      </section>
+
+      <section class="session-card hidden" id="sessionCard">
+        <div>
+          <span>当前用户</span>
+          <strong id="currentUsername">未登录</strong>
+        </div>
+        <button class="secondary-action" type="button" id="logoutBtn">退出</button>
+      </section>
+
+      <div class="main-content hidden" id="mainContent">
+        <div class="page-slider" id="pageSlider" aria-label="页面滑动区域">
+          <div class="page-track" id="pageTrack">
+            <section class="app-page" aria-label="首页">
+              <section class="wheel-card">
+                <div class="wheel-meta">
+                  <div class="custom-select" id="listSelectWrap">
+                    <button class="custom-select-trigger" type="button" id="listSelectTrigger" aria-expanded="false" aria-haspopup="listbox">
+                      <span id="listSelectLabel">公司附近</span>
+                    </button>
+                    <div class="custom-select-menu hidden" id="listSelectMenu" role="listbox"></div>
+                  </div>
+                  <strong id="restaurantCount">0 家餐厅</strong>
+                </div>
+                <div class="wheel-wrap" aria-live="polite">
+                  <div class="wheel-pointer" aria-hidden="true"></div>
+                  <div class="wheel" id="wheel">
+                    <div class="wheel-empty">先新增餐厅</div>
+                  </div>
+                </div>
+                <button class="primary-action" type="button" id="spinBtn">开始抽取！</button>
+              </section>
+
+              <section class="panel list-panel">
+                <div class="panel-head panel-head--compact">
+                  <div>
+                    <p class="eyebrow">My List</p>
+                    <h2>我的餐厅池</h2>
+                  </div>
+                </div>
+                <div id="restaurantList" class="restaurant-list"></div>
+              </section>
+
+              <section class="panel collection-panel">
+                <div class="panel-head panel-head--compact">
+                  <div>
+                    <p class="eyebrow">Collection</p>
+                    <h2>list 收藏</h2>
+                  </div>
+                </div>
+                <form class="share-code-form" id="shareCodeForm">
+                  <input id="shareCodeInput" type="text" maxlength="40" placeholder="输入别人发来的 list 分享码" />
+                  <button class="primary-action" type="submit">打开收藏</button>
+                </form>
+                <p class="panel-desc">收藏的餐厅池会折叠在 list 收藏中，展开后可勾选餐厅加入当前应用的列表。</p>
+                <div id="collectionList" class="collection-list"></div>
+              </section>
+            </section>
+
+            <section class="app-page" aria-label="新增餐厅">
+              <section class="panel add-restaurant-page">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">Restaurant</p>
+                    <h2>新增餐厅</h2>
+                  </div>
+                  <span class="panel-tip">在线保存</span>
+                </div>
+                <form id="restaurantForm" class="restaurant-form">
+                  <label>
+                    餐厅名称
+                    <input id="nameInput" type="text" maxlength="40" required placeholder="例如：阿姨麻辣烫" />
+                  </label>
+                  <label>
+                    推荐食物（可选）
+                    <input id="foodInput" type="text" maxlength="60" placeholder="例如：番茄肥牛米线" />
+                  </label>
+                  <div class="form-grid">
+                    <label>
+                      菜系
+                      <input id="cuisineInput" type="text" maxlength="30" placeholder="例如：川湘菜 / 日料" />
+                    </label>
+                    <label>
+                      人均
+                      <input id="priceInput" type="number" min="0" step="1" placeholder="例如：48" />
+                    </label>
+                  </div>
+                  <label>
+                    招牌菜备注
+                    <textarea id="signatureInput" rows="3" maxlength="300" placeholder="例如：招牌烤鱼、酸梅汤不错，适合 4-6 人"></textarea>
+                  </label>
+                  <label class="file-field">
+                    上传菜单附件
+                    <input id="menuInput" type="file" accept="image/*,.pdf,.doc,.docx,.xls,.xlsx,.txt" />
+                    <span id="fileHint"></span>
+                  </label>
+                  <button class="primary-action" type="submit" id="submitBtn">添加</button>
+                </form>
+              </section>
+
+            </section>
+          </div>
+        </div>
+
+        <div class="page-dots" id="pageDots" aria-label="页面切换">
+          <button class="page-dot active" type="button" data-page="0" aria-label="首页"></button>
+          <button class="page-dot" type="button" data-page="1" aria-label="新增餐厅"></button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal hidden" id="addRestaurantModal" role="dialog" aria-modal="true" aria-labelledby="addRestaurantModalTitle">
+    <div class="modal-backdrop" id="addRestaurantModalBackdrop"></div>
+    <section class="modal-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">Add To List</p>
+          <h2 id="addRestaurantModalTitle">添加到列表</h2>
+        </div>
+      </div>
+      <label class="modal-field">
+        选择已有列表
+        <select id="modalListSelect"></select>
+      </label>
+      <label class="modal-field">
+        或新增列表
+        <input id="modalNewListInput" type="text" maxlength="40" placeholder="输入新列表名称" />
+      </label>
+      <p class="panel-desc" id="addRestaurantModalDesc">填写新列表名称时，会先创建该列表，再把餐厅添加进去。</p>
+      <div class="modal-actions">
+        <button class="primary-action" type="button" id="confirmAddRestaurantBtn">确定添加</button>
+        <button class="secondary-action" type="button" id="cancelAddRestaurantBtn">取消</button>
+      </div>
+    </section>
+  </div>
+
+  <div class="modal hidden" id="collectionDetailModal" role="dialog" aria-modal="true" aria-labelledby="collectionDetailTitle">
+    <div class="modal-backdrop" id="collectionDetailModalBackdrop"></div>
+    <section class="modal-panel collection-detail-panel">
+      <div class="panel-head">
+        <div>
+          <p class="eyebrow">List Collection</p>
+          <h2 id="collectionDetailTitle">收藏列表</h2>
+        </div>
+        <button class="text-action" type="button" id="closeCollectionDetailBtn">关闭</button>
+      </div>
+      <div id="collectionDetailBody"></div>
+    </section>
+  </div>
+
+  <div class="modal hidden" id="restaurantListDetailModal" role="dialog" aria-modal="true" aria-labelledby="restaurantListDetailTitle">
+    <div class="modal-backdrop" id="restaurantListDetailModalBackdrop"></div>
+    <section class="modal-panel collection-detail-panel">
+      <div class="panel-head restaurant-detail-head">
+        <div class="restaurant-title-wrap">
+          <p class="eyebrow">My List</p>
+          <input class="list-title-input" id="restaurantListDetailTitle" type="text" maxlength="40" aria-label="列表名称" />
+        </div>
+        <div class="modal-head-actions">
+          <button class="text-action" type="button" id="shareListBtn">分享列表</button>
+          <button class="text-action" type="button" id="closeRestaurantListDetailBtn">关闭</button>
+        </div>
+      </div>
+      <div class="share-result hidden" id="shareResult" aria-live="polite"></div>
+      <div id="restaurantListDetailBody"></div>
+    </section>
+  </div>
+
+  <div class="modal hidden" id="resultCard" role="dialog" aria-modal="true" aria-labelledby="resultName">
+    <div class="modal-backdrop" id="resultModalBackdrop"></div>
+    <section class="modal-panel result-modal-panel">
+      <p class="eyebrow">抽中了</p>
+      <h2 id="resultName">今天吃点啥</h2>
+      <span class="result-food" id="resultFood">推荐食物</span>
+      <button class="primary-action" type="button" id="closeResultBtn">就吃这个！</button>
+    </section>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="supabase-config.js?v=20260625-1637"></script>
+  <script src="app.js?v=20260625-1637"></script>
+</body>
+</html>
