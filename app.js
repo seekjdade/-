@@ -1335,8 +1335,6 @@ async function deleteCollection(collectionId) {
 function bindEvents() {
   let touchStartX = 0;
   let touchStartY = 0;
-  const collectionSwipeStarts = new Map();
-  const listSwipeStarts = new Map();
   els.pageDots?.addEventListener("click", (event) => {
     const target = event.target;
     if (!(target instanceof HTMLElement)) return;
@@ -1396,16 +1394,6 @@ function bindEvents() {
     if (!els.shareResult.classList.contains("hidden") && !els.shareResult.contains(target) && !els.shareListBtn.contains(target)) {
       hideShareCode();
       updateShareButtonText();
-    }
-    if (!els.collectionList.contains(target)) {
-      els.collectionList.querySelectorAll(".collection-swipe.is-open").forEach((row) => {
-        row.classList.remove("is-open");
-      });
-    }
-    if (!els.restaurantList.contains(target)) {
-      els.restaurantList.querySelectorAll(".collection-swipe.is-open").forEach((row) => {
-        row.classList.remove("is-open");
-      });
     }
   });
   els.spinBtn.addEventListener("click", spinWheel);
@@ -1498,76 +1486,6 @@ function bindEvents() {
     if (!(button instanceof HTMLElement) || !button.dataset.id) return;
     openImportCollectionModal(button.dataset.id);
   });
-  els.collectionList.addEventListener(
-    "touchstart",
-    (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const row = target.closest(".collection-swipe");
-      if (!(row instanceof HTMLElement) || !row.dataset.collectionId) return;
-      const touch = event.touches[0];
-      collectionSwipeStarts.set(row.dataset.collectionId, {
-        x: touch.clientX,
-        y: touch.clientY,
-      });
-    },
-    { passive: true }
-  );
-  els.collectionList.addEventListener(
-    "touchend",
-    (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const row = target.closest(".collection-swipe");
-      if (!(row instanceof HTMLElement) || !row.dataset.collectionId) return;
-      const start = collectionSwipeStarts.get(row.dataset.collectionId);
-      if (!start) return;
-      const touch = event.changedTouches[0];
-      const dx = touch.clientX - start.x;
-      const dy = touch.clientY - start.y;
-      if (Math.abs(dx) < 42 || Math.abs(dx) < Math.abs(dy)) return;
-      els.collectionList.querySelectorAll(".collection-swipe.is-open").forEach((item) => {
-        if (item !== row) item.classList.remove("is-open");
-      });
-      row.classList.toggle("is-open", dx < 0);
-    },
-    { passive: true }
-  );
-  els.restaurantList.addEventListener(
-    "touchstart",
-    (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const row = target.closest(".collection-swipe");
-      if (!(row instanceof HTMLElement) || !row.dataset.listId) return;
-      const touch = event.touches[0];
-      listSwipeStarts.set(row.dataset.listId, {
-        x: touch.clientX,
-        y: touch.clientY,
-      });
-    },
-    { passive: true }
-  );
-  els.restaurantList.addEventListener(
-    "touchend",
-    (event) => {
-      const target = event.target;
-      if (!(target instanceof HTMLElement)) return;
-      const row = target.closest(".collection-swipe");
-      if (!(row instanceof HTMLElement) || !row.dataset.listId) return;
-      const start = listSwipeStarts.get(row.dataset.listId);
-      if (!start) return;
-      const touch = event.changedTouches[0];
-      const dx = touch.clientX - start.x;
-      const dy = touch.clientY - start.y;
-      if (Math.abs(dx) < 42 || Math.abs(dx) < Math.abs(dy)) return;
-      els.restaurantList.querySelectorAll(".collection-swipe.is-open").forEach((item) => {
-        if (item !== row) item.classList.remove("is-open");
-      });
-      row.classList.toggle("is-open", dx < 0);
-    },
-    { passive: true }
-  );
 }
 
 async function init() {

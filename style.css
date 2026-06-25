@@ -990,8 +990,8 @@ textarea:focus {
 }
 
 .collection-swipe {
-  position: relative;
-  overflow: hidden;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
   border-radius: 20px;
 }
 
@@ -1004,52 +1004,14 @@ textarea:focus {
   grid-template-columns: 1fr auto;
   align-items: stretch;
   border: 1px solid rgba(224, 176, 103, 0.3);
-  border-radius: 20px;
-  background: rgba(255, 255, 255, 0.78);
-  transition: transform 0.2s ease;
-}
-
-.collection-swipe.is-open {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 92px;
-}
-
-.collection-swipe.is-open .collection-card {
-  transform: none;
   border-radius: 20px 0 0 20px;
-}
-
-.collection-swipe.is-open .collection-delete-action {
-  position: static;
-  width: auto;
-  border-radius: 0 20px 20px 0;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .collection-swipe {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 92px;
-  }
-
-  .collection-swipe .collection-card {
-    transform: none;
-    border-radius: 20px 0 0 20px;
-  }
-
-  .collection-swipe .collection-delete-action {
-    position: static;
-    width: auto;
-    border-radius: 0 20px 20px 0;
-  }
+  background: rgba(255, 255, 255, 0.78);
 }
 
 .collection-delete-action {
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
   order: 2;
-  width: 92px;
+  min-width: 72px;
+  padding: 0 14px;
   border: 1px solid rgba(255, 135, 135, 0.45);
   border-radius: 0 20px 20px 0;
   background: rgba(255, 214, 214, 0.92);
