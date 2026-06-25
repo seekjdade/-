@@ -664,6 +664,76 @@ h1 {
   font-weight: 800;
 }
 
+.admin-pin-form,
+.admin-pin-form label {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-pin-form {
+  gap: 12px;
+}
+
+.admin-pin-form label {
+  gap: 7px;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.admin-users {
+  margin-top: 12px;
+}
+
+.admin-users-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  color: var(--orange-dark);
+  font-size: 13px;
+  font-weight: 900;
+}
+
+.admin-users-head span {
+  color: var(--muted);
+}
+
+.admin-user-list {
+  display: flex;
+  max-height: min(54vh, 380px);
+  max-height: min(54svh, 380px);
+  flex-direction: column;
+  gap: 8px;
+  overflow: auto;
+  padding-right: 2px;
+}
+
+.admin-user-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 11px 12px;
+  border: 1px solid rgba(224, 176, 103, 0.3);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.78);
+}
+
+.admin-user-card strong {
+  min-width: 0;
+  overflow: hidden;
+  color: var(--text);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-user-card small {
+  flex: 0 0 auto;
+  color: var(--muted);
+  font-size: 12px;
+}
+
 .form-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;

@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>今天吃点啥</title>
-  <link rel="stylesheet" href="style.css?v=20260625-1919" />
+  <link rel="stylesheet" href="style.css?v=20260625-1925" />
 </head>
 <body>
   <main class="app">
@@ -133,12 +133,33 @@
               </section>
 
             </section>
+            <section class="app-page admin-page hidden" id="adminPage" aria-label="管理员">
+              <section class="panel admin-panel">
+                <div class="panel-head">
+                  <div>
+                    <p class="eyebrow">Admin</p>
+                    <h2>管理员页面</h2>
+                  </div>
+                  <span class="panel-tip">豆瓣酱专属</span>
+                </div>
+                <form class="admin-pin-form" id="adminPinForm">
+                  <label>
+                    PIN 码
+                    <input id="adminPinInput" type="password" inputmode="numeric" maxlength="4" placeholder="请输入 PIN 码" />
+                  </label>
+                  <button class="primary-action" type="submit" id="adminPinBtn">查看用户</button>
+                </form>
+                <p class="auth-message" id="adminMessage" aria-live="polite"></p>
+                <div class="admin-users hidden" id="adminUsers"></div>
+              </section>
+            </section>
           </div>
         </div>
 
         <div class="page-dots" id="pageDots" aria-label="页面切换">
           <button class="page-dot active" type="button" data-page="0" aria-label="首页"></button>
           <button class="page-dot" type="button" data-page="1" aria-label="新增餐厅"></button>
+          <button class="page-dot admin-dot hidden" type="button" data-page="2" aria-label="管理员"></button>
         </div>
       </div>
     </section>
@@ -212,7 +233,7 @@
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script src="supabase-config.js?v=20260625-1919"></script>
-  <script src="app.js?v=20260625-1919"></script>
+  <script src="supabase-config.js?v=20260625-1925"></script>
+  <script src="app.js?v=20260625-1925"></script>
 </body>
 </html>

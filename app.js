@@ -2,6 +2,8 @@ const SESSION_KEY = "today-eat-session-v2";
 const ACTIVE_LIST_KEY = "today-eat-active-list-v1";
 const MAX_ATTACHMENT_BYTES = 2.5 * 1024 * 1024;
 const DEFAULT_LIST_NAMES = ["公司附近", "团建聚餐"];
+const ADMIN_USERNAME = "豆瓣酱";
+const ADMIN_PIN = "0510";
 
 const config = window.TODAY_EAT_SUPABASE || {};
 const supabaseReady =
@@ -19,6 +21,8 @@ const state = {
   activeListId: localStorage.getItem(ACTIVE_LIST_KEY) || "",
   restaurants: [],
   collections: [],
+  adminUsers: [],
+  adminPinVerified: false,
   busy: false,
   activePage: 0,
 };
@@ -89,6 +93,12 @@ const els = {
   restaurantListDetailTitle: document.getElementById("restaurantListDetailTitle"),
   restaurantListDetailBody: document.getElementById("restaurantListDetailBody"),
   closeRestaurantListDetailBtn: document.getElementById("closeRestaurantListDetailBtn"),
+  adminPage: document.getElementById("adminPage"),
+  adminPinForm: document.getElementById("adminPinForm"),
+  adminPinInput: document.getElementById("adminPinInput"),
+  adminPinBtn: document.getElementById("adminPinBtn"),
+  adminMessage: document.getElementById("adminMessage"),
+  adminUsers: document.getElementById("adminUsers"),
 };
 
 function loadSession() {
@@ -122,6 +132,7 @@ function setBusy(busy) {
     els.shareListBtn,
     els.confirmAddRestaurantBtn,
     els.restaurantListDetailTitle,
+    els.adminPinBtn,
   ].forEach((btn) => {
     if (btn) btn.disabled = busy;
   });
@@ -140,6 +151,10 @@ function requireDb() {
 
 function normalizeUsername(value) {
   return String(value || "").trim();
+}
+
+function isAdminUser() {
+  return normalizeUsername(state.currentUser?.username) === ADMIN_USERNAME;
 }
 
 function validateUsername(username) {
@@ -316,11 +331,15 @@ function logout() {
   state.lists = [];
   state.restaurants = [];
   state.collections = [];
+  state.adminUsers = [];
+  state.adminPinVerified = false;
   state.selectedListId = "";
   state.activeListId = "";
+  state.activePage = 0;
   editingId = "";
   pendingAttachment = null;
   saveSession(null);
+  if (els.adminPinForm) els.adminPinForm.reset();
   els.form.reset();
   renderResult(null);
   render();
@@ -466,8 +485,14 @@ function normalizeCollection(row, share) {
   };
 }
 
+function visiblePageCount() {
+  return isAdminUser() ? 3 : 2;
+}
+
 function setActivePage(page) {
-  state.activePage = page === 1 ? 1 : 0;
+  const maxPage = visiblePageCount() - 1;
+  const nextPage = Math.max(0, Math.min(maxPage, Number(page) || 0));
+  state.activePage = nextPage;
   if (els.pageTrack) {
     els.pageTrack.style.transform = `translateX(-${state.activePage * 100}%)`;
   }
@@ -574,13 +599,110 @@ function formatPrice(price) {
 
 function renderAuth() {
   const loggedIn = Boolean(state.currentUser);
+  const admin = isAdminUser();
   els.authCard.classList.toggle("hidden", loggedIn);
   els.sessionCard.classList.toggle("hidden", !loggedIn);
   els.mainContent.classList.toggle("hidden", !loggedIn);
   els.currentUsername.textContent = loggedIn ? state.currentUser.username : "未登录";
+  els.adminPage?.classList.toggle("hidden", !admin);
+  els.pageDots?.querySelector(".admin-dot")?.classList.toggle("hidden", !admin);
+  if (!admin) {
+    state.adminPinVerified = false;
+    state.adminUsers = [];
+    if (state.activePage > 1) state.activePage = 0;
+  }
   if (!supabaseReady && !loggedIn) {
     setAuthMessage("请先配置 Supabase 后再注册登录。", "error");
   }
+}
+
+function setAdminMessage(message, type = "") {
+  if (!els.adminMessage) return;
+  els.adminMessage.textContent = message || "";
+  els.adminMessage.dataset.type = type;
+}
+
+function renderAdminUsers() {
+  if (!els.adminUsers) return;
+  if (!isAdminUser()) {
+    els.adminUsers.classList.add("hidden");
+    els.adminUsers.innerHTML = "";
+    return;
+  }
+  if (!state.adminPinVerified) {
+    els.adminUsers.classList.add("hidden");
+    els.adminUsers.innerHTML = "";
+    return;
+  }
+  els.adminUsers.classList.remove("hidden");
+  if (state.adminUsers.length === 0) {
+    els.adminUsers.innerHTML = '<div class="empty-list">暂无用户。</div>';
+    return;
+  }
+  els.adminUsers.innerHTML = `
+    <div class="admin-users-head">
+      <strong>全部用户</strong>
+      <span>${state.adminUsers.length} 人</span>
+    </div>
+    <div class="admin-user-list">
+      ${state.adminUsers
+        .map(
+          (user) => `
+            <article class="admin-user-card">
+              <strong>${escapeHtml(user.username)}</strong>
+              <small>${escapeHtml(formatDateTime(user.createdAt))}</small>
+            </article>
+          `
+        )
+        .join("")}
+    </div>
+  `;
+}
+
+function formatDateTime(value) {
+  if (!value) return "未知时间";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "未知时间";
+  return date.toLocaleString("zh-CN", { hour12: false });
+}
+
+async function loadAdminUsers() {
+  if (!isAdminUser() || !requireDb()) return;
+  setBusy(true);
+  setAdminMessage("正在加载用户...");
+  try {
+    const { data, error } = await db.from("eat_users").select("id, username, created_at").order("created_at", { ascending: false });
+    if (error) throw error;
+    state.adminUsers = (data || []).map((user) => ({
+      id: String(user.id),
+      username: String(user.username || ""),
+      createdAt: String(user.created_at || ""),
+    }));
+    setAdminMessage(`已加载 ${state.adminUsers.length} 个用户。`, "success");
+    renderAdminUsers();
+  } catch (error) {
+    setAdminMessage(`加载失败：${error.message || error}`, "error");
+  } finally {
+    setBusy(false);
+  }
+}
+
+async function handleAdminPinSubmit(event) {
+  event.preventDefault();
+  if (!isAdminUser()) {
+    setAdminMessage("当前账号不是管理员。", "error");
+    return;
+  }
+  const pin = String(els.adminPinInput?.value || "").trim();
+  if (pin !== ADMIN_PIN) {
+    state.adminPinVerified = false;
+    state.adminUsers = [];
+    setAdminMessage("PIN 码不正确。", "error");
+    renderAdminUsers();
+    return;
+  }
+  state.adminPinVerified = true;
+  await loadAdminUsers();
 }
 
 function renderListControls() {
@@ -815,6 +937,7 @@ function render() {
   buildWheelSegments(items);
   renderList();
   renderCollections();
+  renderAdminUsers();
   updateFileHint();
   setActivePage(state.activePage);
 }
@@ -1358,7 +1481,7 @@ function bindEvents() {
       const dx = touch.clientX - touchStartX;
       const dy = touch.clientY - touchStartY;
       if (Math.abs(dx) < 45 || Math.abs(dx) < Math.abs(dy)) return;
-      setActivePage(dx < 0 ? 1 : 0);
+      setActivePage(state.activePage + (dx < 0 ? 1 : -1));
     },
     { passive: true }
   );
@@ -1366,6 +1489,7 @@ function bindEvents() {
     event.preventDefault();
     handleLogin();
   });
+  els.adminPinForm?.addEventListener("submit", handleAdminPinSubmit);
   els.loginBtn.addEventListener("click", handleLogin);
   els.registerBtn.addEventListener("click", handleRegister);
   els.logoutBtn.addEventListener("click", logout);
